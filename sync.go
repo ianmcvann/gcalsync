@@ -113,6 +113,11 @@ func syncCalendar(db *sql.DB, calendarService *calendar.Service, calendarID stri
 				for otherAccountName, calendarIDs := range calendars {
 					for _, otherCalendarID := range calendarIDs {
 						if otherCalendarID != calendarID {
+							// Check if this calendar is blocked from the target calendar
+							var isBlocked int
+							blockErr := db.QueryRow("SELECT 1 FROM calendar_blocks WHERE source_calendar_id = ? AND target_calendar_id = ?", 
+								calendarID, otherCalendarID).Scan(&isBlocked)
+							isBlockedCalendar := (blockErr == nil && isBlocked == 1)
 							var existingBlockerEventID string
 							var last_updated string
 							var originCalendarID string
@@ -142,8 +147,15 @@ func syncCalendar(db *sql.DB, calendarService *calendar.Service, calendarID stri
 								log.Fatalf("Error creating calendar client: %v", err)
 							}
 
-							blockerSummary := fmt.Sprintf("O_o %s", event.Summary)
-							blockerDescription := event.Description
+							var blockerSummary, blockerDescription string
+							if isBlockedCalendar {
+								blockerSummary = "O_o Busy"
+								blockerDescription = ""
+								fmt.Printf("      🚫 Creating anonymous busy block: %s -> %s\n", calendarID, otherCalendarID)
+							} else {
+								blockerSummary = fmt.Sprintf("O_o %s", event.Summary)
+								blockerDescription = event.Description
+							}
 
 							if event.End == nil {
 								startTime, _ := time.Parse(time.RFC3339, event.Start.DateTime)

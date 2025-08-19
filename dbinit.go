@@ -101,4 +101,21 @@ func dbInit() {
 			log.Fatalf("Error updating db_version table: %v", err)
 		}
 	}
+
+	if dbVersion == 4 {
+		_, err = db.Exec(`CREATE TABLE IF NOT EXISTS calendar_blocks (
+			source_calendar_id TEXT,
+			target_calendar_id TEXT,
+			PRIMARY KEY (source_calendar_id, target_calendar_id)
+		)`)
+		if err != nil {
+			log.Fatalf("Error creating calendar_blocks table: %v", err)
+		}
+
+		dbVersion = 5
+		_, err = db.Exec(`UPDATE db_version SET version = 5 WHERE name = 'gcalsync'`)
+		if err != nil {
+			log.Fatalf("Error updating db_version table: %v", err)
+		}
+	}
 }
