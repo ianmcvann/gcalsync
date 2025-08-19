@@ -80,6 +80,14 @@ Say goodbye to calendar conflicts and hello to seamless synchronization. 🎉
         ```
         ./gcalsync list
         ```
+    - To block calendar events (create anonymous 'Busy' events):
+        ```
+        ./gcalsync block <source_calendar_id> <target_calendar_id>
+        ```
+    - To unblock calendar events (show full event details again):
+        ```
+        ./gcalsync unblock <source_calendar_id> <target_calendar_id>
+        ```
 
 ## 📚 Documentation
 
@@ -98,6 +106,30 @@ To desync your calendars and remove all blocker events, run the `gcalsync desync
 ### 📋 Listing Calendars
 
 To list all calendars that have been added to the local database, run the `gcalsync list` command. The program will display the account name and calendar ID for each calendar.
+
+### 🚫 Blocking Calendar Events
+
+To create anonymous "Busy" events instead of showing full event details from one calendar to another, use the `gcalsync block` command:
+
+```
+./gcalsync block <source_calendar_id> <target_calendar_id>
+```
+
+This will configure the system so that events from the source calendar will appear as anonymous "Busy" events in the target calendar (without showing event titles, descriptions, or other details). This is useful for maintaining privacy while still blocking time slots.
+
+Both calendars must be added to gcalsync first using the `gcalsync add` command. After setting up blocking, run `gcalsync sync` to apply the changes.
+
+### ✅ Unblocking Calendar Events
+
+To remove anonymous blocking and show full event details again, use the `gcalsync unblock` command:
+
+```
+./gcalsync unblock <source_calendar_id> <target_calendar_id>
+```
+
+This will restore the normal behavior where events from the source calendar will show their full details (title, description, etc.) in the target calendar. After unblocking, run `gcalsync sync` to apply the changes.
+
+You can also use `gcalsync list` to see current blocking relationships.
 
 ### 🎗️ Disabling Reminders
 
